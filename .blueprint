@@ -1,0 +1,57 @@
+created:
+    - database/factories/ClientFactory.php
+    - database/factories/ContactFactory.php
+    - database/factories/AddressFactory.php
+    - database/factories/CityFactory.php
+    - database/factories/StateFactory.php
+    - database/factories/CountryFactory.php
+    - database/factories/TaskFactory.php
+    - database/factories/TaskTypeFactory.php
+    - database/factories/CollectionFactory.php
+    - database/factories/ProductFactory.php
+    - database/factories/InvoiceFactory.php
+    - database/factories/ReceiptFactory.php
+    - database/factories/DistributionFactory.php
+    - database/migrations/2024_05_12_181855_create_clients_table.php
+    - database/migrations/2024_05_12_181856_create_contacts_table.php
+    - database/migrations/2024_05_12_181857_create_addresses_table.php
+    - database/migrations/2024_05_12_181858_create_cities_table.php
+    - database/migrations/2024_05_12_181859_create_states_table.php
+    - database/migrations/2024_05_12_181900_create_countries_table.php
+    - database/migrations/2024_05_12_181901_create_tasks_table.php
+    - database/migrations/2024_05_12_181902_create_task_types_table.php
+    - database/migrations/2024_05_12_181903_create_collections_table.php
+    - database/migrations/2024_05_12_181904_create_products_table.php
+    - database/migrations/2024_05_12_181905_create_invoices_table.php
+    - database/migrations/2024_05_12_181906_create_receipts_table.php
+    - database/migrations/2024_05_12_181907_create_distributions_table.php
+    - database/migrations/2024_05_12_181908_create_client_contact_table.php
+    - database/migrations/2024_05_12_181909_create_invoice_product_table.php
+    - app/Models/Client.php
+    - app/Models/Contact.php
+    - app/Models/Address.php
+    - app/Models/City.php
+    - app/Models/State.php
+    - app/Models/Country.php
+    - app/Models/Task.php
+    - app/Models/TaskType.php
+    - app/Models/Collection.php
+    - app/Models/Product.php
+    - app/Models/Invoice.php
+    - app/Models/Receipt.php
+    - app/Models/Distribution.php
+models:
+    User: { name: string, email: string, email_verified_at: 'timestamp nullable default:NULL', password: string, remember_token: 'string:100 nullable default:NULL', theme: "string nullable default:'default'", theme_color: 'string nullable default:NULL' }
+    Client: { company_name: string, logo: 'string nullable', website: 'string nullable', gstin: 'string:64 nullable', phone_number: 'string:20 nullable', email: 'string nullable', firm_type: 'string:128 nullable', address_id: 'id foreign nullable', softdeletes: softDeletes, relationships: { hasOne: Address, belongsToMany: Contact } }
+    Contact: { firstname: 'string:90', lastname: 'string:90', designation: 'string nullable', email: 'string nullable', phone: 'string:20 nullable', softdeletes: softDeletes, relationships: { belongsToMany: Client } }
+    Address: { building_number: 'string:64', street_address: string, location: string, city_id: 'id foreign nullable', state_id: 'id foreign', country_id: 'id foreign', zipcode: 'string:20', relationships: { HasOne: 'City, State, Country', belongsTo: Client } }
+    City: { name: string, state_id: 'id foreign', softdeletes: softDeletes, relationships: { belongsTo: State } }
+    State: { name: string, country_id: 'id foreign', softdeletes: softDeletes, relationships: { belongsTo: Country, hasMany: City } }
+    Country: { sort_name: 'string:5', name: string, phonecode: 'string:6', softdeletes: softDeletes, relationships: { hasMany: State } }
+    Task: { client_id: 'id foreign', task_id: 'id foreign', softdeletes: softDeletes, relationships: { hasOne: 'TaskType, Client' } }
+    TaskType: { task_name: string, hourly_rate: 'decimal:6,2 default:0', softdeletes: softDeletes, belongsTo: 'TaskType, Client' }
+    Collection: { name: string, softdeletes: softDeletes, relationships: { hasMany: Product } }
+    Product: { name: string, description: 'text nullable', default_quantity: 'integer default:1', price: 'decimal:8,2 default:0', hsncode: 'integer nullable', is_active: 'boolean default:true', softdeletes: softDeletes, relationships: { belongsTo: Collection } }
+    Invoice: { invoice_number: 'string:64', invoice_date: timestamp, invoice_duedate: timestamp, taxes_for_line_item: 'boolean default:false', invoice_subtotal: 'decimal:8,2 default:0', tax1_label: 'string nullable', tax1_value: 'decimal:8,2 default:0 nullable', tax2_label: 'string nullable', tax2_value: 'decimal:8,2 default:0 nullable', round_off: 'decimal:8,2 default:0', discount_value: 'decimal:8,2 default:0', discount_type: string, invoice_total: 'decimal:8,2 default:0', paid_to_date: 'decimal:8,2 default:0', balance_due: 'decimal:8,2 default:0', client_id: unsignedBigInteger, softdeletes: softDeletes, relationships: { belongsTo: Client, belongsToMany: 'Product, Receipt:&Distribution' } }
+    Receipt: { receipt_number: 'string:64', payment_amount: 'decimal:8,2 default:0', assignment: json, assigned_amount: 'decimal:8,2 default:0', receipt_date: timestamp, softdeletes: softDeletes, relationships: { belongsToMany: 'Invoice:&Distribution' } }
+    Distribution: { invoice_id: unsignedBigInteger, receipt_id: unsignedBigInteger, amount_assigned: 'decimal:8,2', balance_amount: 'decimal:8,2', applied_date: timestamp }
